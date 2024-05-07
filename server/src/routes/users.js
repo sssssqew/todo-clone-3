@@ -45,14 +45,16 @@ router.post('/login', expressAsyncHandler(async (req, res, next) => { // /api/us
 router.post('/logout', (req, res, next) => {
     res.json("로그아웃")
 })
-router.put('/:id', isAuth, expressAsyncHandler(async (req, res, next) => {
-    const user = await User.findById(req.params.id) // 회원인지 검사
+router.put('/', isAuth, expressAsyncHandler(async (req, res, next) => {
+    const user = await User.findById(req.user._id) // 회원인지 검사
     if(!user){
         res.status(404).json({ code: 404, message: 'User Not Founded '})
     }else{
         user.name = req.body.name || user.name 
         user.email = req.body.email || user.email 
         user.password = req.body.password || user.password 
+        user.lastModifiedAt = new Date() // 사용자정보 수정 시각 
+
         const updatedUser = await user.save() // 실제 사용자정보 수정을 DB 에 반영
         const { name, email, userId, isAdmin, createdAt } = updatedUser 
         res.json({
@@ -62,12 +64,12 @@ router.put('/:id', isAuth, expressAsyncHandler(async (req, res, next) => {
         })
     }
 }))
-router.delete('/:id', isAuth, expressAsyncHandler(async (req, res, next) => {
-    const user = await User.findByIdAndDelete(req.params.id)
+router.delete('/', isAuth, expressAsyncHandler(async (req, res, next) => {
+    const user = await User.findByIdAndDelete(req.user._id)
     if(!user){
         res.status(404).json({ code: 404, message: 'User Not Found' })
     }else{
-        res.status(200).json({ code: 204, message: 'User deleted successfully!'})
+        res.status(204).json({ code: 204, message: 'User deleted successfully!'})
     }
 }))
 module.exports = router 

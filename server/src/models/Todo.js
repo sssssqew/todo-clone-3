@@ -10,6 +10,16 @@ const todoSchema = new Schema({ // 스키마 정의
         required: true, 
         ref: 'User' // User 라는 데이터 모델 -> 조금 있다가 정의 (사용자 ID값 )
     },
+    category: {
+        type: String,
+        required: true, 
+        trim: true 
+    },
+    imgUrl: {
+        type: String, 
+        required: true, 
+        trim: true 
+    },
     title: {
         type: String,
         required: true,
