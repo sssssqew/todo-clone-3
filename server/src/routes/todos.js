@@ -103,32 +103,36 @@ router.get('/group/:field', isAuth, isAdmin, expressAsyncHandler(async (req, res
                     _id: `$${req.params.field}`,
                     count: { $sum: 1 }
                 }
-            }
+            },
+            { $sort : { _id : 1} }
         ])
         console.log(`Number Of Group: , ${docs.length}`) // 그룹 갯수 
-        docs.sort((d1, d2) => d1._id - d2._id) // _id 기준으로 정렬
+        // docs.sort((d1, d2) => d1._id - d2._id) // _id 기준으로 정렬
         res.json({ code: 200, docs })
     }else{
         res.status(400).json({ code: 400, message: 'you gave wrong field to group documents !'})
     }
-        
-    
 }))
 router.get('/group/mine/:field', isAuth, expressAsyncHandler(async (req, res, next) => { // 사용자 대쉬보드
-    const docs = await Todo.aggregate([
-        {
-            $match: { author: new ObjectId(req.user._id) } // 내가 작성한 할일목록 필터링
-        },
-        {
-            $group: {
-                _id: `$${req.params.field}`,
-                count: { $sum: 1 }
-            }
-        }
-    ])
-    console.log(`Number Of Group: , ${docs.length}`) // 그룹 갯수 
-    docs.sort((d1, d2) => d1._id - d2._id) // _id 기준으로 정렬
-    res.json({ code: 200, docs })
+    if(req.params.field === 'category' || req.params.field === 'isDone'){
+        const docs = await Todo.aggregate([
+            {
+                $match: { author: new ObjectId(req.user._id) } // 내가 작성한 할일목록 필터링
+            },
+            {
+                $group: {
+                    _id: `$${req.params.field}`,
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort : { _id : 1} }
+        ])
+        console.log(`Number Of Group: , ${docs.length}`) // 그룹 갯수 
+        // docs.sort((d1, d2) => d1._id - d2._id) // _id 기준으로 정렬
+        res.json({ code: 200, docs })
+    }else{
+        res.status(400).json({ code: 400, message: 'you gave wrong field to group documents !'})
+    }
 }))
 router.get('/group/date/:field', isAuth, isAdmin, expressAsyncHandler(async (req, res, next) => {
    
@@ -141,10 +145,11 @@ router.get('/group/date/:field', isAuth, isAdmin, expressAsyncHandler(async (req
                     _id: { year: { $year: `$${req.params.field}`}, month: { $month: `$${req.params.field}` }},
                     count: { $sum: 1 }
                 }
-            }
+            },
+            { $sort : { _id : 1} }
         ])
         console.log(`Number Of Group: ${docs.length}`) // 그룹 갯수
-        docs.sort((d1, d2) => d1._id - d2._id)
+        // docs.sort((d1, d2) => d1._id - d2._id)
         res.json({ code: 200, docs})
         }else{
         res.status(400).json({ code: 400, message: 'you gave wrong field to group documents !' })
@@ -164,10 +169,11 @@ router.get('/group/mine/date/:field', isAuth, expressAsyncHandler(async (req, re
                         _id: { year: { $year: `$${req.params.field}`}, month: { $month: `$${req.params.field}` }},
                         count: { $sum: 1 }
                     }
-                }
+                },
+                { $sort : { _id : 1} }
             ])
             console.log(`Number Of Group: ${docs.length}`) // 그룹 갯수
-            docs.sort((d1, d2) => d1._id - d2._id)
+            // docs.sort((d1, d2) => d1._id - d2._id)
             res.json({ code: 200, docs})
            }else{
             res.status(400).json({ code: 400, message: 'you gave wrong field to group documents !' })

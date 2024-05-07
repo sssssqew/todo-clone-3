@@ -10,7 +10,7 @@ const config = require('./config')
 const {asyncFunction, wrap} = require('./async')
 
 const corsOptions = {
-    origin: 'http://localhost:3000', // 해당 URL 주소만 요청을 허락함 
+    origin: '*', // 해당 URL 주소만 요청을 허락함 
     credentials: true // 사용자 인증이 필요한 리소스를 요청할 수 있도록 허용함
 }
 
