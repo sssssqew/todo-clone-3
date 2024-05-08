@@ -48,6 +48,11 @@ const todoSchema = new Schema({ // 스키마 정의
     // 아주 복잡한 몽고 db 필드 더 추가되어야 됨 
 })
 
+todoSchema.path('category').validate(function(value){
+    return /오락|공부|음식|자기계발|업무|패션|여행/.test(value)
+}, 'category `{VALUE}` 는 유효하지 않은 카테고리입니다.')
+
+
 // 스키마 -> 컴파일 (몽고 db 가 인식할 수 있는 데이터 구조로 변환) -> 모델 
 const Todo = mongoose.model('Todo', todoSchema) // 컬렉션 이름 : Todo 에서 첫번째 글자를 소문자로 변경하고 맨 끝에 s 붙임 -> todos
 module.exports = Todo
