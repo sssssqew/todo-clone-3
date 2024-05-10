@@ -1,4 +1,5 @@
 const mongoose = require('mongoose')
+const moment = require('moment')
 
 const { Schema } = mongoose 
 const { Types: { ObjectId }} = Schema
@@ -51,6 +52,22 @@ const todoSchema = new Schema({ // 스키마 정의
 todoSchema.path('category').validate(function(value){
     return /오락|공부|음식|자기계발|업무|패션|여행/.test(value)
 }, 'category `{VALUE}` 는 유효하지 않은 카테고리입니다.')
+
+todoSchema.virtual('status').get(function(){
+    return this.isDone ? "종료" : "진행중"
+})
+
+todoSchema.virtual('createdAgo').get(function(){
+    return moment(this.createdAt).fromNow()
+})
+
+todoSchema.virtual('lastModifiedAgo').get(function(){
+    return moment(this.lastModifiedAt).fromNow()
+})
+
+todoSchema.virtual('finishedAgo').get(function(){
+    return moment(this.finishedAt).fromNow()
+})
 
 
 // 스키마 -> 컴파일 (몽고 db 가 인식할 수 있는 데이터 구조로 변환) -> 모델 
