@@ -14,22 +14,27 @@ const { limitUsage } = require('../../limiter')
 
 const router = express.Router()
 
-router.get('/', limitUsage, isAuth, expressAsyncHandler(async (req, res, next) => { // /api/todos/
-    const todos = await Todo.find({ author: req.user._id }).populate('author', ['name', 'userId'])
+// isAuth : 전체 할일목록을 조회할 권한이 있는지 검사하는 미들웨어 
+router.get('/', isAuth, expressAsyncHandler(async (req, res, next) => {
+    const todos = await Todo.find({ author: req.user._id }).populate('author', ['name', 'email', 'userId', 'createdAt', 'lastModifiedAt']) // req.user 는 isAuth 에서 전달된 값
     if(todos.length === 0){
-        res.status(404).json({ code: 404, message: 'Failed to find todos!'})
+      res.status(404).json({ code: 404, message: 'Fail to find todos !'})
     }else{
-        res.json({ code: 200, todos: todos.map(todo => {
-            return {
-                ...todo._doc,
-                createdAgo: todo.createdAgo, // virtual 필드 조회 
-                lastModifiedAgo: todo.lastModifiedAgo,
-                finishedAgo: todo.finishedAgo,
-                status: todo.status 
-            }
-        }) })
+      res.json({ code: 200, todos: todos.map(todo => {
+        return {...todo._doc, 
+        	  createdAgo: todo.createdAgo, 
+              lastModifiedAgo: todo.lastModifiedAgo,
+              finishedAgo: todo.finishedAgo, 
+              status: todo.status,
+              author: {...todo.author._doc, 
+                        createdAgo: todo.author.createdAgo, 
+                        lastModifiedAgo: todo.author.lastModifiedAgo, 
+                        status: todo.author.status
+                      }
+              }
+      }) })
     }
-}))
+  }))
 router.get('/:id', limitUsage, isAuth, expressAsyncHandler(async (req, res, next) => { // /api/todos/{id}
     const todo = await Todo.findOne({
         author: req.user._id, 
