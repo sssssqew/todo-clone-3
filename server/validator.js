@@ -36,7 +36,13 @@ const validateUserPassword = () => {
            .matches(/[!@#$%^&*]/)
            .withMessage("password must be at least 1 special character")
            .bail() // value: 요청본문에서 전달된 비밀번호 
-           .custom((value, { req }) => req.body.confirmPassword === value) // filter 메서드처럼 동작
+           .custom((value, { req }) => {
+            console.log(req.type)
+            if(req.type === 'register') 
+                return req.body.confirmPassword === value
+            else 
+                return true  
+           }) // filter 메서드처럼 동작
            .withMessage("Password don't match")
 }
 

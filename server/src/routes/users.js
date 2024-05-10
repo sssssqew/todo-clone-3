@@ -12,7 +12,10 @@ const { limitUsage } = require('../../limiter')
 
 const router = express.Router() // 라우터 모듈
 
-router.post('/register', limitUsage, [ // 폼검증을 위한 미들웨어 
+router.post('/register', (req, res, next) => {
+    req.type = "register"
+    next()
+}, [ // 폼검증을 위한 미들웨어 
     validateUserName(),
     validateUserEmail(),
     validateUserPassword()
@@ -51,10 +54,14 @@ router.post('/register', limitUsage, [ // 폼검증을 위한 미들웨어
         })
     }
 }))
-router.post('/login', limitUsage, [
+router.post('/login', (req, res, next) => {
+    req.type = null 
+    next()
+}, [
     validateUserEmail(),
     validateUserPassword()
 ], expressAsyncHandler(async (req, res, next) => { // /api/users/login
+    req.type = null 
     const errors = validationResult(req)
     if(!errors.isEmpty()){
         console.log(errors.array())
